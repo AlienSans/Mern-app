@@ -1,5 +1,6 @@
 const express = require("express");
 const fs = require("fs");
+const path = require("path");
 const cors = require("cors");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -7,11 +8,12 @@ const cookieParser = require("cookie-parser");
 const imageDownloader = require("image-downloader");
 const multer = require("multer");
 const User = require("./models/userModel");
+const Vehicle = require("./models/vehicleModel");
 const app = express();
 
 const bcryptSalt = bcrypt.genSaltSync(10);
 
-app.use("/uploads", express.static(__dirname + "/uploads"));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
@@ -89,18 +91,62 @@ app.post("/upload-by-link", async (req, res) => {
   res.json(newName);
 });
 
-const photosMiddleware = multer({ dest: "uploads" });
+const photosMiddleware = multer({ dest: "/uploads" });
 app.post("/upload", photosMiddleware.array("photos", 100), (req, res) => {
   const uploadedFiles = [];
   for (let i = 0; i < req.files.length; i++) {
     const { path, originalname } = req.files[i];
     const parts = originalname.split(".");
     const ext = parts[parts.length - 1];
-    const newPath = path + "." + ext;
+    const newPath = parts + "." + ext;
     fs.renameSync(path, newPath);
     uploadedFiles.push(newPath.replace("uploads/", ""));
   }
   res.json(uploadedFiles);
+});
+
+app.post("/vehicles", (req, res) => {
+  const { token } = req.cookies;
+  const {
+    name,
+    type,
+    address,
+    feature,
+    addedPhotos,
+    description,
+    checkIn,
+    checkOut,
+    maxGuests,
+    extraInfo,
+  } = req.body;
+
+  console.log(req.body);
+
+  jwt.verify(token, process.env.JWT_SECRET, {}, async (err, userData) => {
+    if (err) throw err;
+    const vehicleDoc = await Vechile.create({
+      owner: userData.id,
+      name,
+      type,
+      address,
+      feature,
+      photos: addedPhotos,
+      description,
+      checkIn,
+      checkOut,
+      maxGuests,
+      extraInfo,
+    });
+    res.json(vehicleDoc);
+  });
+});
+
+app.get("/vehicles", (req, res) => {
+  const { token } = req.cookies;
+  jwt.verify(token, process.env.JWT_SECRET, {}, async (err, userData) => {
+    const { id } = userData;
+    res.json(await Vehicle.find({ owner: id }));
+  });
 });
 
 module.exports = app;
