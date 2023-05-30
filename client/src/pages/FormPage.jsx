@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import AccountNav from "./AccountNav";
-import { Navigate } from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
 
 function FormPage() {
+  const { id } = useParams();
+
   const [name, setName] = useState("");
   const [type, setType] = useState("");
   const [address, setAddress] = useState("");
@@ -17,9 +19,30 @@ function FormPage() {
   const [maxGuests, setMaxGuests] = useState(1);
   const [redirect, setRedirect] = useState(false);
 
-  async function addNewPlace(ev) {
+  useEffect(() => {
+    if (!id) {
+      return;
+    }
+    axios.get("/vehicles/" + id).then((response) => {
+      const { data } = response;
+      console.log(data);
+      setName(data.name);
+      setType(data.type);
+      setAddress(data.address);
+      setAddedPhotos(data.photos);
+      setDescription(data.description);
+      setFeature(data.feature);
+      setExtraInfo(data.extraInfo);
+      setCheckIn(data.checkIn);
+      setCheckOut(data.checkOut);
+      setMaxGuests(data.maxGuests);
+    });
+  }, [id]);
+
+  async function savePlace(ev) {
     ev.preventDefault();
-    await axios.post("/vehicles", {
+
+    const vehicleData = {
       name,
       type,
       address,
@@ -30,8 +53,20 @@ function FormPage() {
       checkIn,
       checkOut,
       maxGuests,
-    });
-    setRedirect(true);
+    };
+
+    if (id) {
+      // update
+      await axios.put("/vehicles", {
+        id,
+        ...vehicleData,
+      });
+      setRedirect(true);
+    } else {
+      //new place
+      await axios.post("/vehicles", vehicleData);
+      setRedirect(true);
+    }
   }
 
   async function addPhotoByLink(ev) {
@@ -81,7 +116,7 @@ function FormPage() {
   return (
     <div>
       <AccountNav />
-      <form onSubmit={addNewPlace}>
+      <form onSubmit={savePlace}>
         <h2 className="text-xl mt-4">name</h2>
         <input
           type="text"
@@ -124,7 +159,7 @@ function FormPage() {
               <div className="h-32 flex" key={index}>
                 <img
                   className="rounded-2xl w-full object-cover"
-                  src={"http://localhost:3000/" + link}
+                  src={"http://localhost:3000/uploads/" + link}
                   alt="photo"
                 />
               </div>
@@ -161,23 +196,48 @@ function FormPage() {
         <h2 className="text-2xl mt-4">Feature</h2>
         <div className="grid mt-2 gap-2 grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
           <label className="border p-4 flex rounded-2xl gap-2 items-center cursor-pointer">
-            <input type="checkbox" name="wifi" onChange={handleCbClick} />
+            <input
+              type="checkbox"
+              checked={feature.includes("wifi")}
+              name="wifi"
+              onChange={handleCbClick}
+            />
             <span>Wifi</span>
           </label>
           <label className="border p-4 flex rounded-2xl gap-2 items-center cursor-pointer">
-            <input type="checkbox" name="parking" onChange={handleCbClick} />
+            <input
+              type="checkbox"
+              checked={feature.includes("parking")}
+              name="parking"
+              onChange={handleCbClick}
+            />
             <span>Free parking</span>
           </label>
           <label className="border p-4 flex rounded-2xl gap-2 items-center cursor-pointer">
-            <input type="checkbox" name="TV" onChange={handleCbClick} />
+            <input
+              type="checkbox"
+              checked={feature.includes("tv")}
+              name="tv"
+              onChange={handleCbClick}
+            />
             <span>TV</span>
           </label>
           <label className="border p-4 flex rounded-2xl gap-2 items-center cursor-pointer">
-            <input type="checkbox" name="driver" onChange={handleCbClick} />
+            <input
+              type="checkbox"
+              checked={feature.includes("driver")}
+              name="driver"
+              onChange={handleCbClick}
+            />
             <span>Driver</span>
           </label>
           <label className="border p-4 flex rounded-2xl gap-2 items-center cursor-pointer">
-            <input type="checkbox" name="gasoline" onChange={handleCbClick} />
+            <input
+              type="checkbox"
+              checked={feature.includes("gasoline")}
+              name="gasoline"
+              onChange={handleCbClick}
+            />
             <span>Gasoline</span>
           </label>
         </div>

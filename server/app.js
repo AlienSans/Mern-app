@@ -91,16 +91,16 @@ app.post("/upload-by-link", async (req, res) => {
   res.json(newName);
 });
 
-const photosMiddleware = multer({ dest: "/uploads" });
+const photosMiddleware = multer({ dest: "uploads" });
 app.post("/upload", photosMiddleware.array("photos", 100), (req, res) => {
   const uploadedFiles = [];
   for (let i = 0; i < req.files.length; i++) {
     const { path, originalname } = req.files[i];
     const parts = originalname.split(".");
     const ext = parts[parts.length - 1];
-    const newPath = parts + "." + ext;
+    const newPath = path + "." + ext;
     fs.renameSync(path, newPath);
-    uploadedFiles.push(newPath.replace("uploads/", ""));
+    uploadedFiles.push(newPath.replace("uploads\\", ""));
   }
   res.json(uploadedFiles);
 });
@@ -146,6 +146,48 @@ app.get("/vehicles", (req, res) => {
   jwt.verify(token, process.env.JWT_SECRET, {}, async (err, userData) => {
     const { id } = userData;
     res.json(await Vehicle.find({ owner: id }));
+  });
+});
+
+app.get("/vehicles/:id", async (req, res) => {
+  const { id } = req.params;
+  res.json(await Vehicle.findById(id));
+});
+
+app.put("/places/:id", async (req, res) => {
+  const { token } = req.cookies;
+  const {
+    id,
+    name,
+    type,
+    address,
+    feature,
+    addedPhotos,
+    description,
+    checkIn,
+    checkOut,
+    maxGuests,
+    extraInfo,
+  } = req.body;
+
+  jwt.verify(token, process.env.JWT_SECRET, {}, async (err, userData) => {
+    const vehicleDoc = await Vehicle.findById(id);
+    if (userData.id === vehicleDoc.owner.toString()) {
+      vehicleDoc.set({
+        name,
+        type,
+        address,
+        feature,
+        photos: addedPhotos,
+        description,
+        checkIn,
+        checkOut,
+        maxGuests,
+        extraInfo,
+      });
+      await vehicleDoc.save();
+      res.json("ok");
+    }
   });
 });
 
