@@ -6,7 +6,7 @@ import axios from "axios";
 function PlacesPage() {
   const [places, setPlaces] = useState([]);
   useEffect(() => {
-    axios.get("/vehicles").then(({ data }) => {
+    axios.get("/user-vehicles").then(({ data }) => {
       setPlaces(data);
     });
   }, []);

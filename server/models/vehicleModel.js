@@ -12,6 +12,7 @@ const vehicleSchema = new mongoose.Schema({
   checkOut: Number,
   maxGuests: Number,
   extraInfo: String,
+  price: Number,
 });
 
 const Vechile = mongoose.model("Vehicle", vehicleSchema);

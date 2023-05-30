@@ -9,6 +9,7 @@ const imageDownloader = require("image-downloader");
 const multer = require("multer");
 const User = require("./models/userModel");
 const Vehicle = require("./models/vehicleModel");
+const Vechile = require("./models/vehicleModel");
 const app = express();
 
 const bcryptSalt = bcrypt.genSaltSync(10);
@@ -118,9 +119,8 @@ app.post("/vehicles", (req, res) => {
     checkOut,
     maxGuests,
     extraInfo,
+    price,
   } = req.body;
-
-  console.log(req.body);
 
   jwt.verify(token, process.env.JWT_SECRET, {}, async (err, userData) => {
     if (err) throw err;
@@ -136,12 +136,13 @@ app.post("/vehicles", (req, res) => {
       checkOut,
       maxGuests,
       extraInfo,
+      price,
     });
     res.json(vehicleDoc);
   });
 });
 
-app.get("/vehicles", (req, res) => {
+app.get("/user-vehicles", (req, res) => {
   const { token } = req.cookies;
   jwt.verify(token, process.env.JWT_SECRET, {}, async (err, userData) => {
     const { id } = userData;
@@ -154,7 +155,7 @@ app.get("/vehicles/:id", async (req, res) => {
   res.json(await Vehicle.findById(id));
 });
 
-app.put("/places/:id", async (req, res) => {
+app.put("/vehicles", async (req, res) => {
   const { token } = req.cookies;
   const {
     id,
@@ -168,6 +169,7 @@ app.put("/places/:id", async (req, res) => {
     checkOut,
     maxGuests,
     extraInfo,
+    price,
   } = req.body;
 
   jwt.verify(token, process.env.JWT_SECRET, {}, async (err, userData) => {
@@ -184,11 +186,16 @@ app.put("/places/:id", async (req, res) => {
         checkOut,
         maxGuests,
         extraInfo,
+        price,
       });
       await vehicleDoc.save();
       res.json("ok");
     }
   });
+});
+
+app.get("/vehicles", async (req, res) => {
+  res.json(await Vehicle.find());
 });
 
 module.exports = app;
