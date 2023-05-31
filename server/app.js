@@ -10,6 +10,7 @@ const multer = require("multer");
 const User = require("./models/userModel");
 const Vehicle = require("./models/vehicleModel");
 const Vechile = require("./models/vehicleModel");
+const Booking = require("./models/bookingModel");
 const app = express();
 
 const bcryptSalt = bcrypt.genSaltSync(10);
@@ -196,6 +197,47 @@ app.put("/vehicles", async (req, res) => {
 
 app.get("/vehicles", async (req, res) => {
   res.json(await Vehicle.find());
+});
+
+function getUserDataFromReq(req) {
+  return new Promise((resolve, reject) => {
+    jwt.verify(
+      req.cookies.token,
+      process.env.JWT_SECRET,
+      {},
+      async (err, userData) => {
+        if (err) throw err;
+        resolve(userData);
+      }
+    );
+  });
+}
+
+app.post("/bookings", async (req, res) => {
+  const userData = await getUserDataFromReq(req);
+  const { place, checkIn, checkOut, numberOfGuests, name, phone, price } =
+    req.body;
+  Booking.create({
+    place,
+    checkIn,
+    checkOut,
+    numberOfGuests,
+    name,
+    phone,
+    price,
+    user: userData.id,
+  })
+    .then((doc) => {
+      res.json(doc);
+    })
+    .catch((err) => {
+      throw err;
+    });
+});
+
+app.get("/bookings", async (req, res) => {
+  const userData = await getUserDataFromReq(req);
+  res.json(await Booking.find({ user: userData.id }));
 });
 
 module.exports = app;

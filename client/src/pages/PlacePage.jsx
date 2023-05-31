@@ -1,11 +1,28 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
+import { useParams, Navigate } from "react-router-dom";
+import { differenceInCalendarDays } from "date-fns";
+import UserContext from "../UserContext";
 
 function PlacePage() {
   const { id } = useParams();
   const [place, setPlace] = useState(null);
   const [showAllPhotos, setShowAllPhotos] = useState(false);
+  const [checkIn, setCheckIn] = useState("");
+  const [checkOut, setCheckOut] = useState("");
+  const [numberOfGuests, setNumberOfGuests] = useState(1);
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [redirect, setRedirect] = useState("");
+  const { user } = useContext(UserContext);
+  let numberOfDays = 0;
+
+  useEffect(() => {
+    if (user) {
+      setName(user.name);
+    }
+  }, [user]);
+
   useEffect(() => {
     if (!id) {
       return;
@@ -16,6 +33,32 @@ function PlacePage() {
   }, [id]);
 
   if (!place) return "";
+
+  if (checkIn && checkOut) {
+    numberOfDays =
+      -1 * differenceInCalendarDays(new Date(checkIn), new Date(checkOut));
+    console.log(numberOfDays);
+  }
+
+  async function bookThis() {
+    console.log(place._id);
+    const data = {
+      checkIn,
+      checkOut,
+      numberOfGuests,
+      name,
+      phone,
+      vehicle: place._id,
+      price: numberOfDays * place.price,
+    };
+    const response = await axios.post("/bookings", data);
+    const bookingId = response.data._id;
+    setRedirect(`/account/bookings/${bookingId}`);
+  }
+
+  if (redirect) {
+    return <Navigate to={redirect} />;
+  }
 
   if (showAllPhotos) {
     return (
@@ -155,19 +198,50 @@ function PlacePage() {
               <div className="flex">
                 <div className="py-3 px-4">
                   <label>Check in:</label>
-                  <input type="date" />
+                  <input
+                    type="date"
+                    value={checkIn}
+                    onChange={(ev) => setCheckIn(ev.target.value)}
+                  />
                 </div>
                 <div className="py-3 px-4 border-l">
                   <label>Check out:</label>
-                  <input type="date" />
+                  <input
+                    type="date"
+                    value={checkOut}
+                    onChange={(ev) => setCheckOut(ev.target.value)}
+                  />
                 </div>
               </div>
               <div className="py-3 px-4 border-t">
                 <label>Number of guests</label>
-                <input type="number" />
+                <input
+                  type="number"
+                  value={numberOfGuests}
+                  onChange={(ev) => setNumberOfGuests(ev.target.value)}
+                />
               </div>
+              {numberOfDays > 0 && (
+                <div className="py-3 px-4 border-t">
+                  <label>Your full name:</label>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(ev) => setName(ev.target.value)}
+                  />
+                  <label>Phone number:</label>
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(ev) => setPhone(ev.target.value)}
+                  />
+                </div>
+              )}
             </div>
-            <button className="primary mt-4">Booking</button>
+            <button onClick={bookThis} className="primary mt-4">
+              Booking
+              {numberOfDays > 0 && <span> ${numberOfDays * place.price}</span>}
+            </button>
           </div>
         </div>
       </div>
@@ -175,10 +249,7 @@ function PlacePage() {
         <div>
           <h2 className="font-semibold text-2xl">Extra Info</h2>
         </div>
-        <div
-          className="mb-4 mt-2
-          onClick={() => setShowAllPhotos(true)} text-sm text-gray-700 leading-5"
-        >
+        <div className="mb-4 mt-2 text-sm text-gray-700 leading-5">
           {place.extraInfo}
         </div>
       </div>
