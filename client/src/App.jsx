@@ -14,6 +14,7 @@ import BookingsPage from "./pages/BookingsPage";
 import BookingPage from "./pages/BookingPage";
 import Payment from "./pages/Payment";
 import PaymentsPage from "./pages/PaymentsPage";
+import NotFoundPage from "./pages/NotFoundPage";
 
 axios.defaults.baseURL = "http://localhost:3000";
 axios.defaults.withCredentials = true;
@@ -39,6 +40,7 @@ function App() {
             element={<Payment />}
           />
         </Route>
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Provider>
   );

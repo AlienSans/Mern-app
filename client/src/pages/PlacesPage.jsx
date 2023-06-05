@@ -1,15 +1,19 @@
 import { Link } from "react-router-dom";
 import AccountNav from "./AccountNav";
-import { useEffect, useState } from "react";
+import UserContext from "../UserContext";
+import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 
 function PlacesPage() {
+  const { user } = useContext(UserContext);
   const [places, setPlaces] = useState([]);
+
   useEffect(() => {
-    axios.get("/user-vehicles").then(({ data }) => {
+    axios.get(`/api/v1/vehicles/user/${user._id}`).then(({ data }) => {
       setPlaces(data);
     });
   }, []);
+
   return (
     <div>
       <AccountNav />

@@ -31,7 +31,10 @@ function Payment() {
     console.log(customerData);
 
     await axios.post("/api/v1/payments", customerData);
-    await axios.post("/api/v1/bookings", state.parameter.dataBooking);
+    await axios.post("/api/v1/bookings", {
+      ...state.parameter.dataBooking,
+      user: customerData.user,
+    });
     setRedirect("/");
   };
 

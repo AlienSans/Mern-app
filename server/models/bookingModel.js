@@ -33,6 +33,8 @@ bookingSchema.pre(/^find/, function (next) {
     path: "vehicle",
     select: "name",
   });
+
+  next();
 });
 
 const Booking = mongoose.model("Booking", bookingSchema);

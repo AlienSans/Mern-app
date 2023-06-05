@@ -16,7 +16,7 @@ const DB = process.env.DATABASE_ATLAS.replace(
 mongoose
   .connect(DB, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("DB connection successful"))
-  .catch((error) => {
+  .catch(error => {
     console.log(error);
   });
 

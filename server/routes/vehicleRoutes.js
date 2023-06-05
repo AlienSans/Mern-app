@@ -17,4 +17,5 @@ router
   .patch(vehicleController.updateVehicle)
   .delete(vehicleController.deleteVehicle);
 
+router.route("/user/:id").get(vehicleController.getVehicleByUser);
 module.exports = router;
