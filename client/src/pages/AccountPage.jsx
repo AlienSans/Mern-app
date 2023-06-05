@@ -14,7 +14,7 @@ function AccountPage() {
   }
 
   const logout = async () => {
-    await axios.post("/logout");
+    await axios.get("/api/v1/users/logout");
     setRedirect("/");
     setUser(null);
   };

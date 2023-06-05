@@ -44,10 +44,10 @@ function PlacesPage() {
               key={index}
             >
               <div className="flex w-32 h-32 bg-gray-300 grow shrink-0">
-                {vehicle.photos.length > 0 && (
+                {vehicle.images.length > 0 && (
                   <img
                     className="object-cover"
-                    src={"http://localhost:3000/uploads/" + vehicle.photos[0]}
+                    src={"http://localhost:3000/uploads/" + vehicle.images[0]}
                     alt=""
                   />
                 )}

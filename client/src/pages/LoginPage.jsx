@@ -7,17 +7,29 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [redirect, setRedirect] = useState(false);
-  const { setUser } = useContext(UserContext);
+  const { setUser, setReady } = useContext(UserContext);
 
   async function handleLoginSubmit(ev) {
     ev.preventDefault();
     try {
-      const { data } = await axios.post("/login", { email, password });
-      setUser(data);
-      alert(`Login Successfuly`);
-      setRedirect(true);
+      if (!email || !password) {
+        alert("Missing Username or Password");
+      }
+
+      const { data } = await axios.post("/api/v1/users/login", {
+        email,
+        password,
+      });
+
+      if (data.status === "success") {
+        alert(`Login Successfuly`);
+        const token = data.token;
+        setUser({ ...data.data.user, token });
+        setReady(true);
+        setRedirect(true);
+      }
     } catch (error) {
-      alert(`Login Failed`);
+      alert("Login Failed or Unauthorized");
     }
   }
 

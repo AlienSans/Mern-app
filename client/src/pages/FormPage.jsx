@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import AccountNav from "./AccountNav";
 import { Navigate, useParams } from "react-router-dom";
+import UserContext from "../UserContext";
 
 function FormPage() {
   const { id } = useParams();
+  const { user } = useContext(UserContext);
 
   const [name, setName] = useState("");
   const [type, setType] = useState("");
@@ -13,31 +15,27 @@ function FormPage() {
   const [photoLink, setPhotoLink] = useState("");
   const [description, setDescription] = useState("");
   const [feature, setFeature] = useState([]);
-  const [extraInfo, setExtraInfo] = useState("");
-  const [checkIn, setCheckIn] = useState("");
-  const [checkOut, setCheckOut] = useState("");
-  const [maxGuests, setMaxGuests] = useState(1);
+  const [summary, setSummary] = useState("");
   const [price, setPrice] = useState("1");
+  const [location, setLocation] = useState("");
   const [redirect, setRedirect] = useState(false);
 
   useEffect(() => {
     if (!id) {
       return;
     }
-    axios.get("/vehicles/" + id).then((response) => {
-      const { data } = response;
-      console.log(data);
-      setName(data.name);
-      setType(data.type);
-      setAddress(data.address);
-      setAddedPhotos(data.photos);
-      setDescription(data.description);
-      setFeature(data.feature);
-      setExtraInfo(data.extraInfo);
-      setCheckIn(data.checkIn);
-      setCheckOut(data.checkOut);
-      setMaxGuests(data.maxGuests);
-      setPrice(data.price);
+    axios.get("/api/v1/vehicles/" + id).then((response) => {
+      const { vehicle } = response.data.data;
+      console.log(vehicle);
+      setName(vehicle.name);
+      setType(vehicle.type);
+      setAddress(vehicle.address);
+      setLocation(vehicle.location);
+      setAddedPhotos(vehicle.images);
+      setDescription(vehicle.description);
+      setFeature(vehicle.feature);
+      setSummary(vehicle.summary);
+      setPrice(vehicle.price);
     });
   }, [id]);
 
@@ -45,29 +43,28 @@ function FormPage() {
     ev.preventDefault();
 
     const vehicleData = {
+      owner: user._id,
       name,
       type,
       address,
-      addedPhotos,
+      location,
+      images: addedPhotos,
       description,
       feature,
-      extraInfo,
-      checkIn,
-      checkOut,
-      maxGuests,
+      summary,
       price,
     };
 
     if (id) {
       // update
-      await axios.put("/vehicles", {
+      await axios.patch(`/api/v1/vehicles/${id}`, {
         id,
         ...vehicleData,
       });
       setRedirect(true);
     } else {
       //new place
-      await axios.post("/vehicles", vehicleData);
+      await axios.post("/api/v1/vehicles", vehicleData);
       setRedirect(true);
     }
   }
@@ -135,14 +132,14 @@ function FormPage() {
     <div>
       <AccountNav />
       <form onSubmit={savePlace}>
-        <h2 className="text-xl mt-4">name</h2>
+        <h2 className="text-xl mt-4">Name Vehicle</h2>
         <input
           type="text"
           placeholder="name"
           value={name}
           onChange={(ev) => setName(ev.target.value)}
         />
-        <h2 className="text-xl mt-4">type</h2>
+        <h2 className="text-xl mt-4">Type Vehicle</h2>
         <input
           type="text"
           placeholder="type"
@@ -155,6 +152,13 @@ function FormPage() {
           placeholder="address"
           value={address}
           onChange={(ev) => setAddress(ev.target.value)}
+        />
+        <h2 className="text-xl mt-4">Location/Place</h2>
+        <input
+          type="text"
+          placeholder="location"
+          value={location}
+          onChange={(ev) => setLocation(ev.target.value)}
         />
         <h2 className="text-xl mt-4">Photos</h2>
         <div className="flex gap-2">
@@ -172,7 +176,7 @@ function FormPage() {
           </button>
         </div>
         <div className="mt-2 grid gap-2 grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-          {addedPhotos.length > 0 &&
+          {addedPhotos?.length > 0 &&
             addedPhotos.map((link, index) => (
               <div className="h-32 flex relative" key={index}>
                 <img
@@ -270,11 +274,11 @@ function FormPage() {
           <label className="border p-4 flex rounded-2xl gap-2 items-center cursor-pointer">
             <input
               type="checkbox"
-              checked={feature.includes("wifi")}
-              name="wifi"
+              checked={feature.includes("unlimited")}
+              name="unlimited"
               onChange={handleCbClick}
             />
-            <span>Wifi</span>
+            <span>Unlimited Mil</span>
           </label>
           <label className="border p-4 flex rounded-2xl gap-2 items-center cursor-pointer">
             <input
@@ -313,49 +317,17 @@ function FormPage() {
             <span>Gasoline</span>
           </label>
         </div>
-        <h2 className="text-2xl mt-4">Extra info</h2>
-        <p className="text-gray-500 text-sm">rules</p>
+        <h2 className="text-2xl mt-4">Summary</h2>
         <textarea
-          value={extraInfo}
-          onChange={(ev) => setExtraInfo(ev.target.value)}
+          value={summary}
+          onChange={(ev) => setSummary(ev.target.value)}
         />
-        <h2 className="text-2xl mt-4">Check in&out times</h2>
-        <div className="grid gap-2 grid-cols-2 md:grid-cols-4">
-          <div>
-            <h3 className="mt-2 -mb-1">Check in time</h3>
-            <input
-              type="text"
-              placeholder="14"
-              value={checkIn}
-              onChange={(ev) => setCheckIn(ev.target.value)}
-            />
-          </div>
-          <div>
-            <h3 className="mt-2 -mb-1">Check out time</h3>
-            <input
-              type="text"
-              placeholder="13"
-              value={checkOut}
-              onChange={(ev) => setCheckOut(ev.target.value)}
-            />
-          </div>
-          <div>
-            <h3 className="mt-2 -mb-1">Max number of guests</h3>
-            <input
-              type="number"
-              value={maxGuests}
-              onChange={(ev) => setMaxGuests(ev.target.value)}
-            />
-          </div>
-          <div>
-            <h3 className="mt-2 -mb-1">Price</h3>
-            <input
-              type="number"
-              value={price}
-              onChange={(ev) => setPrice(ev.target.value)}
-            />
-          </div>
-        </div>
+        <h2 className="text-2xl mt-4">Price</h2>
+        <input
+          type="number"
+          value={price}
+          onChange={(ev) => setPrice(ev.target.value)}
+        />
         <button className="primary my-4">Save</button>
       </form>
     </div>

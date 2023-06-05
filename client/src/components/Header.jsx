@@ -5,7 +5,7 @@ import UserContext from "../UserContext";
 function Header() {
   const { user } = useContext(UserContext);
   return (
-    <header className="flex justify-between">
+    <header className="flex border-b sticky top-0 z-50 h-20 justify-between items-center px-20 bg-white">
       <Link to={"/"} href="" className="flex items-center gap-1">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -23,12 +23,12 @@ function Header() {
         </svg>
         <span className="font-bold text-xl">Ride On Time</span>
       </Link>
-      <div className="flex gap-2 border border-gray-300 rounded-full py-2 px-4 shadow-md shadow-gray-300">
-        <div>Anywhere</div>
+      <div className="flex gap-2 border border-gray-300 rounded-full py-2 px-4 shadow-sm hover:shadow-md">
+        <button className="bg-transparent px-2">Anywhere</button>
         <div className="border-l border-gray-300"></div>
-        <div>Any week</div>
+        <button className="bg-transparent px-2">Any week</button>
         <div className="border-l border-gray-300"></div>
-        <div>Add guest</div>
+        <button className="bg-transparent px-2">Add guest</button>
         <button className="bg-primary text-white p-2 rounded-full">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -47,7 +47,9 @@ function Header() {
         </button>
       </div>
       <div className="flex gap-10 items-center">
-        <span className="font-medium text-l">Solusi Kendaraan untuk anda</span>
+        <button className="bg-transparent font-medium text-l">
+          Solusi Kendaraan untuk anda
+        </button>
         <button className="bg-white">
           <svg
             xmlns="http://www.w3.org/2000/svg"
