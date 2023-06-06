@@ -6,7 +6,7 @@ const AppError = require("../utils/appError");
 
 const signToken = id =>
   jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: 9000,
+    expiresIn: process.env.JWT_EXPIRES_IN,
   });
 
 const createSendToken = (user, statusCode, res) => {
@@ -101,13 +101,6 @@ exports.protect = catchAsync(async (req, res, next) => {
       )
     );
   }
-
-  // 4) Check if user changed password after the token was issued
-  // if (currentUser.changedPasswordAfter(decoded.iat)) {
-  //   return next(
-  //     new AppError("User recently changed password! Please log in again!", 401)
-  //   );
-  // }
 
   // Grant access to protected route
   req.user = currentUser;

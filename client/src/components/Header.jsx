@@ -24,11 +24,11 @@ function Header() {
         <span className="font-bold text-xl">Ride On Time</span>
       </Link>
       <div className="flex gap-2 border border-gray-300 rounded-full py-2 px-4 shadow-sm hover:shadow-md">
-        <button className="bg-transparent px-2">Anywhere</button>
+        <button className="bg-transparent px-2 w-40">Location</button>
         <div className="border-l border-gray-300"></div>
-        <button className="bg-transparent px-2">Any week</button>
+        <button className="bg-transparent px-2 w-40">Price</button>
         <div className="border-l border-gray-300"></div>
-        <button className="bg-transparent px-2">Add guest</button>
+        <button className="bg-transparent px-2 w-40">Name</button>
         <button className="bg-primary text-white p-2 rounded-full">
           <svg
             xmlns="http://www.w3.org/2000/svg"

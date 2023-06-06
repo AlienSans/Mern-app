@@ -11,6 +11,6 @@ router
   .get(paymentController.getAllPayment)
   .post(paymentController.createPayment);
 
-router.route("/:user").get(paymentController.getPaymentById);
+router.route("/:userId").get(paymentController.getPaymentById);
 
 module.exports = router;

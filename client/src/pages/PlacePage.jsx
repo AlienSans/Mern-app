@@ -180,7 +180,7 @@ function PlacePage() {
               {vehicle.images?.[2] && (
                 <img
                   onClick={() => setShowAllPhotos(true)}
-                  className="aspect-square object-cover cursor-pointer relative top-2"
+                  className="aspect-square  object-cover cursor-pointer relative top-2"
                   src={"http://localhost:3000/uploads/" + vehicle.images[2]}
                 />
               )}

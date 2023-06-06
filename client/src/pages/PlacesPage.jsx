@@ -6,11 +6,11 @@ import axios from "axios";
 
 function PlacesPage() {
   const { user } = useContext(UserContext);
-  const [places, setPlaces] = useState([]);
+  const [vehicles, setVehicles] = useState([]);
 
   useEffect(() => {
     axios.get(`/api/v1/vehicles/user/${user._id}`).then(({ data }) => {
-      setPlaces(data);
+      setVehicles(data.data.vehicles);
     });
   }, []);
 
@@ -40,8 +40,8 @@ function PlacesPage() {
         </Link>
       </div>
       <div className="mt-4">
-        {places.length > 0 &&
-          places.map((vehicle, index) => (
+        {vehicles.length > 0 &&
+          vehicles.map((vehicle, index) => (
             <Link
               to={"/account/places/" + vehicle._id}
               className="flex cursor-pointer gap-4 bg-gray-100 p-4 rounded-2xl"

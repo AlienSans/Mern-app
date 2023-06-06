@@ -49,37 +49,22 @@ exports.createVehicle = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.getVehicleById = catchAsync(async (req, res, next) => {
-  const vehicle = await Vehicle.find({ owner: req.params.id });
-  if (!vehicle) {
+exports.getVehicleByOwner = catchAsync(async (req, res, next) => {
+  const vehicles = await Vehicle.find({ owner: req.params.id });
+  if (!vehicles) {
     return next(new AppError("No vehicle found with that ID", 404));
   }
 
   res.status(200).json({
     status: "success",
     data: {
-      vehicle,
+      vehicles,
     },
   });
 });
 
 exports.getVehicle = catchAsync(async (req, res, next) => {
   const vehicle = await Vehicle.findById(req.params.id);
-
-  if (!vehicle) {
-    return next(new AppError("No vehicle found with that ID", 404));
-  }
-
-  res.status(200).json({
-    status: "success",
-    data: {
-      vehicle,
-    },
-  });
-});
-
-exports.getVehicleByUser = catchAsync(async (req, res, next) => {
-  const vehicle = await Vehicle.find({ user: req.params.id });
 
   if (!vehicle) {
     return next(new AppError("No vehicle found with that ID", 404));

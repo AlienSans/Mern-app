@@ -14,7 +14,7 @@ exports.getAllPayment = catchAsync(async (req, res, next) => {
 });
 
 exports.getPaymentById = catchAsync(async (req, res, next) => {
-  const payments = await Payment.find({ user: req.params.id });
+  const payments = await Payment.find({ user: req.params.userId });
 
   res.status(200).json({
     status: "success",

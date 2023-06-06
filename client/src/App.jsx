@@ -39,8 +39,8 @@ function App() {
             path="/checkout-session/:vehicleId/:userId"
             element={<Payment />}
           />
+          <Route path="*" element={<NotFoundPage />} />
         </Route>
-        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Provider>
   );
